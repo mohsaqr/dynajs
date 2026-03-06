@@ -1,6 +1,6 @@
 # dynajs
 
-A lightweight, zero-dependency JavaScript/TypeScript library for **Transition Network Analysis (TNA)** and **Sequential Pattern Discovery**. Extracted from the full-featured [tnaj](https://github.com/mohsaqr/tna-js) and [codynaj](https://github.com/mohsaqr/codynaj) packages, dynajs provides only the core analysis essentials in a small, self-contained bundle (~46 KB minified).
+A lightweight, zero-dependency JavaScript/TypeScript library for **Dynamic Network Analysis ** and **Sequential Pattern Discovery**. Extracted from the full-featured [tnaj](https://github.com/mohsaqr/tna-js) and [codynaj](https://github.com/mohsaqr/codynaj) packages, dynajs provides only the core analysis essentials in a small, self-contained bundle (~46 KB minified).
 
 ## Table of Contents
 
