@@ -13,6 +13,10 @@ export type {
   CentralityResult,
   ClusterResult,
   TNAData,
+  CommunityResult,
+  LayoutAlgorithm,
+  LayoutResult,
+  DegreeDistribution,
 } from './core/types.js';
 
 // ── Model ─────────────────────────────────────────────────────────────
@@ -37,6 +41,11 @@ export { centralities, AVAILABLE_MEASURES } from './analysis/centralities.js';
 export { prune } from './analysis/prune.js';
 export { clusterData } from './analysis/cluster.js';
 export { stateFrequencies, statePresence } from './analysis/frequencies.js';
+
+// ── SNA ──────────────────────────────────────────────────────────────
+export { communities } from './sna/community.js';
+export { layout } from './sna/layout.js';
+export { networkDensity, degreeDistribution } from './sna/metrics.js';
 
 // ── Patterns ──────────────────────────────────────────────────────────
 export { discoverPatterns } from './patterns/discover.js';

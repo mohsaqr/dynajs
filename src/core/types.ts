@@ -64,7 +64,7 @@ export interface GroupTNA {
 }
 
 /** Centrality measure names. */
-export type CentralityMeasure = 'InStrength' | 'Betweenness';
+export type CentralityMeasure = 'InStrength' | 'OutStrength' | 'Closeness' | 'Betweenness';
 
 /** Centrality result: map from state label to measure values. */
 export interface CentralityResult {
@@ -97,4 +97,38 @@ export interface TNAData {
     maxSequenceLength: number;
     meanSequenceLength: number;
   };
+}
+
+// ── SNA types ────────────────────────────────────────────────────────
+
+/** Community detection result. */
+export interface CommunityResult {
+  labels: string[];
+  /** Community index (0-based) per node. */
+  assignments: number[];
+  /** Final modularity score. */
+  modularity: number;
+  /** Number of communities found. */
+  nCommunities: number;
+}
+
+/** Layout algorithm names. */
+export type LayoutAlgorithm = 'spring' | 'fr';
+
+/** Force-directed layout result. */
+export interface LayoutResult {
+  x: Float64Array;
+  y: Float64Array;
+  labels: string[];
+}
+
+/** Degree distribution per node. */
+export interface DegreeDistribution {
+  /** Count of incoming edges per node (unweighted). */
+  inDegree: Float64Array;
+  /** Count of outgoing edges per node (unweighted). */
+  outDegree: Float64Array;
+  /** inDegree + outDegree. */
+  totalDegree: Float64Array;
+  labels: string[];
 }
