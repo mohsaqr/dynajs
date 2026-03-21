@@ -37,6 +37,10 @@ A lightweight, zero-dependency JavaScript/TypeScript library for **Dynamic Netwo
   - [Matrix Utilities](#matrix-utilities)
     - [Matrix Class](#matrix-class)
     - [Scaling Functions](#scaling-functions)
+  - [SNA: Network Layout](#sna-network-layout)
+    - [`layout()`](#layoutmodel-options)
+  - [SNA: Community Detection](#sna-community-detection)
+  - [SNA: Network Metrics](#sna-network-metrics)
 - [Type Reference](#type-reference)
 - [Examples](#examples)
   - [Complete Analysis Pipeline](#complete-analysis-pipeline)
@@ -66,7 +70,7 @@ dynajs has **zero runtime dependencies**. It ships ESM, CJS, and TypeScript decl
 ## Quick Start
 
 ```typescript
-import { tna, centralities, prune, summary, discoverPatterns } from 'dynajs';
+import { tna, centralities, prune, summary, discoverPatterns, layout } from 'dynajs';
 
 // Your sequence data: rows = sessions/learners, columns = time steps
 const sequences = [
@@ -860,6 +864,98 @@ const { weights: w2 } = applyScaling(m, ['rank', 'minmax']);
 
 ---
 
+### SNA: Network Layout
+
+#### `layout(model, options?)`
+
+Compute a 2D layout for any TNA model. Returns normalized positions in `[0, 1]`.
+
+```typescript
+import { tna, layout } from 'dynajs';
+
+const model = tna(sequences);
+const result = layout(model, { algorithm: 'kamada-kawai' });
+
+// result.x — Float64Array of x positions [0, 1]
+// result.y — Float64Array of y positions [0, 1]
+// result.labels — state labels
+
+result.labels.forEach((label, i) => {
+  console.log(`${label}: (${result.x[i].toFixed(3)}, ${result.y[i].toFixed(3)})`);
+});
+```
+
+**Options:**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `algorithm` | `LayoutAlgorithm` | `'spring'` | Layout algorithm to use |
+| `iterations` | `number` | `300` | Simulation steps (for iterative algorithms) |
+| `width` | `number` | `100` | Layout area width (affects iterative algorithms) |
+| `height` | `number` | `100` | Layout area height (affects iterative algorithms) |
+
+**Available algorithms (10):**
+
+| Algorithm | Description |
+|-----------|-------------|
+| `'spring'` | Weighted spring model with repulsion, attraction, and centering gravity |
+| `'fr'` | Fruchterman-Reingold force-directed layout with simulated annealing |
+| `'circle'` | Nodes evenly spaced around a circle |
+| `'grid'` | Nodes arranged in a square grid |
+| `'random'` | Deterministic seeded random positions |
+| `'concentric'` | 3 concentric rings sorted by node degree (highest-degree nodes at center) |
+| `'spectral'` | Eigenvector embedding of the graph Laplacian — reveals cluster structure |
+| `'kamada-kawai'` | Energy model where screen distance is proportional to graph-theoretic shortest-path distance |
+| `'star'` | Hub node (highest degree) at center, direct neighbors on inner ring, rest on outer ring |
+| `'hierarchical'` | BFS-layered layout from hub node, layers arranged top-to-bottom |
+
+```typescript
+// Compare layouts
+for (const algo of ['circle', 'fr', 'kamada-kawai', 'spectral', 'star'] as const) {
+  const pos = layout(model, { algorithm: algo });
+  console.log(`${algo}: node 0 at (${pos.x[0].toFixed(2)}, ${pos.y[0].toFixed(2)})`);
+}
+```
+
+**Return type: `LayoutResult`**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `x` | `Float64Array` | X positions normalized to [0, 1] |
+| `y` | `Float64Array` | Y positions normalized to [0, 1] |
+| `labels` | `string[]` | State/node labels |
+
+---
+
+### SNA: Community Detection
+
+#### `communities(model, options?)`
+
+Detect communities in a TNA network using label propagation.
+
+```typescript
+import { tna, communities } from 'dynajs';
+
+const model = tna(sequences);
+const result = communities(model);
+// result.assignments — number[] of community IDs per node
+// result.k — number of communities detected
+```
+
+---
+
+### SNA: Network Metrics
+
+#### `networkDensity(model)`
+
+Compute the density of a TNA network (proportion of non-zero edges).
+
+#### `degreeDistribution(model)`
+
+Compute in-degree and out-degree distributions for all nodes.
+
+---
+
 ## Type Reference
 
 ```typescript
@@ -961,6 +1057,31 @@ interface DiscoverOptions {
 interface PatternResult {
   patterns: PatternEntry[];
   _raw: RawPatterns[];
+}
+
+// Layout types
+type LayoutAlgorithm =
+  | 'spring' | 'fr' | 'circle' | 'grid' | 'random'
+  | 'concentric' | 'spectral' | 'kamada-kawai'
+  | 'star' | 'hierarchical';
+
+interface LayoutResult {
+  x: Float64Array;             // x positions normalized to [0, 1]
+  y: Float64Array;             // y positions normalized to [0, 1]
+  labels: string[];            // node/state labels
+}
+
+// Community types
+interface CommunityResult {
+  assignments: number[];       // community ID per node
+  k: number;                   // number of communities
+}
+
+// Network metrics
+interface DegreeDistribution {
+  inDegree: Float64Array;
+  outDegree: Float64Array;
+  labels: string[];
 }
 ```
 
@@ -1096,7 +1217,8 @@ significant.forEach(p => {
 | **Clustering** | 4 distance metrics | 9 distance metrics + numeric clustering |
 | **Bootstrap / Permutation** | No | Yes |
 | **Stability / Reliability** | No | Yes |
-| **Communities / Cliques** | No | Yes |
+| **Network Layout** | 10 algorithms (spring, FR, circle, grid, spectral, Kamada-Kawai, star, hierarchical, concentric, random) | No |
+| **Communities** | Label propagation | Yes (multiple algorithms) |
 | **WTNA** | No | Yes |
 | **Pattern Discovery** | Yes (full engine) | No (separate codynaj package) |
 | **Dependencies** | 0 | 0 |

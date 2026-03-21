@@ -113,7 +113,7 @@ export interface CommunityResult {
 }
 
 /** Layout algorithm names. */
-export type LayoutAlgorithm = 'spring' | 'fr';
+export type LayoutAlgorithm = 'spring' | 'fr' | 'circle' | 'grid' | 'spectral' | 'kamada-kawai' | 'star' | 'hierarchical' | 'concentric' | 'random';
 
 /** Force-directed layout result. */
 export interface LayoutResult {
