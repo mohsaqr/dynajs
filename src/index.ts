@@ -41,6 +41,8 @@ export { centralities, AVAILABLE_MEASURES } from './analysis/centralities.js';
 export { prune } from './analysis/prune.js';
 export { clusterData } from './analysis/cluster.js';
 export { stateFrequencies, statePresence } from './analysis/frequencies.js';
+export { buildDFG, buildDFGFromSequences } from './analysis/dfg.js';
+export type { DFGMetric, DFGNode, DFGEdge, DFGResult, DFGOptions } from './analysis/dfg.js';
 
 // ── SNA ──────────────────────────────────────────────────────────────
 export { communities } from './sna/community.js';
